@@ -192,8 +192,12 @@ class LdapManagerUser implements LdapManagerUserInterface
 
     private function bindUser()
     {
+        $username = $this->username;
+        if (isset($this->params['client']['bind_user_pattern'])) {
+            $username = str_replace('&username&', $username,$this->params['client']['bind_user_pattern']);
+        }
         return $this->ldapConnection
-            ->bind($this->username, $this->password);
+            ->bind($username, $this->password);
     }
 
     private static function slugify($role)
