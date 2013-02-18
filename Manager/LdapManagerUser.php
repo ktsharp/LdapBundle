@@ -154,30 +154,7 @@ class LdapManagerUser implements LdapManagerUserInterface
             throw new \InvalidArgumentException("If you want skip the roles getting, please set skip_roles to true under client key");
         }
 
-        $tab = array();
-
-        $filter = isset($this->params['role']['filter'])
-            ? $this->params['role']['filter']
-            : '';
-
-        $entries = $this->ldapConnection
-            ->search(array(
-                'base_dn'  => $this->params['role']['base_dn'],
-                'filter'   => sprintf('(&%s(%s=%s))',
-                                      $filter,
-                                      $this->params['role']['user_attribute'],
-                                      $this->ldapConnection->escape($this->getUserId())
-                ),
-                'attrs'    => array(
-                    $this->params['role']['name_attribute']
-                )
-            ));
-
-        for ($i = 0; $i < $entries['count']; $i++) {
-            array_push($tab, sprintf('ROLE_%s',
-                                     self::slugify($entries[$i][$this->params['role']['name_attribute']][0])
-            ));
-        }
+        $tab = $this->getGroups($this->getUserId());
 
         $this->_ldapUser['roles'] = $tab;
 
@@ -198,6 +175,51 @@ class LdapManagerUser implements LdapManagerUserInterface
         }
         return $this->ldapConnection
             ->bind($username, $this->password);
+    }
+
+    private function getGroups($memberDn, $depth = 0)
+    {
+        if ($depth >= 10) {
+            throw new \Exception('LDAP Group recursion is too deep');
+        }
+
+        $tab = array();
+
+        $filter = isset($this->params['role']['filter'])
+            ? $this->params['role']['filter']
+            : '';
+
+        $entries = $this->ldapConnection
+            ->search(array(
+                'base_dn'  => $this->params['role']['base_dn'],
+                'filter'   => sprintf('(&%s(%s=%s))',
+                                      $filter,
+                                      $this->params['role']['user_attribute'],
+                                      $this->ldapConnection->escape($memberDn)
+                ),
+                'attrs'    => array(
+                    $this->params['role']['name_attribute'],
+                    $this->params['role']['user_id']
+                )
+            ));
+
+        for ($i = 0; $i < $entries['count']; $i++) {
+            array_push($tab, sprintf('ROLE_%s',
+                                     self::slugify($entries[$i][$this->params['role']['name_attribute']][0])
+            ));
+            if ($this->params['role']['recursive_search']) {
+                $tab = array_unique(
+                    array_merge(
+                        $tab,
+                        $this->getGroups($entries[$i][$this->params['role']['user_id']], $depth + 1)
+                    )
+                );
+            }
+        }
+
+        $this->_ldapUser['roles'] = $tab;
+
+        return $this;
     }
 
     private static function slugify($role)
