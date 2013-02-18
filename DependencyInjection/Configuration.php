@@ -80,6 +80,7 @@ class Configuration implements ConfigurationInterface
                   ->thenInvalid('Only dn or username')
                 ->end()
               ->end()
+              ->booleanNode('recursive_search')->defaultFalse()->end()
           ->end()
           ;
 
