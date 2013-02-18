@@ -219,7 +219,7 @@ class LdapManagerUser implements LdapManagerUserInterface
 
         $this->_ldapUser['roles'] = $tab;
 
-        return $this;
+        return $tab;
     }
 
     private static function slugify($role)
