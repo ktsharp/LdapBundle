@@ -141,6 +141,6 @@ class LdapUser implements UserInterface, EquatableInterface, \Serializable
      */
     public function __toString()
     {
-        return ($username = $this->getUserName()) ? $username : $this->getEmail();
+        return $this->getUserName();
     }
 }
