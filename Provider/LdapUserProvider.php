@@ -21,7 +21,7 @@ class LdapUserProvider implements UserProviderInterface
     /**
      * @var \IMAG\LdapBundle\Manager\LdapManagerUserInterface
      */
-    protected $ldapManager;
+    private $ldapManager;
 
     /**
      * Constructor
