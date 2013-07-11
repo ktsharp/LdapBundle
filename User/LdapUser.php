@@ -27,12 +27,12 @@ class LdapUser implements UserInterface, EquatableInterface, \Serializable
 
     public function getGroups()
     {
-        return $this->groups;
+        return (array) $this->groups;
     }
 
     public function getGroupNames()
     {
-        return $this->groups ? $this->groups : array();
+        return $this->getGroups();
     }
 
     public function getUserName()
