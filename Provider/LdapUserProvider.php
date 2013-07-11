@@ -2,6 +2,7 @@
 
 namespace IMAG\LdapBundle\Provider;
 
+use IMAG\LdapBundle\Manager\LdapManagerUser;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException,
     Symfony\Component\Security\Core\Exception\UsernameNotFoundException,
     Symfony\Component\Security\Core\User\UserInterface,
@@ -48,6 +49,7 @@ class LdapUserProvider implements UserProviderInterface
             throw new UsernameNotFoundException(sprintf('User "%s" not found', $username));
         }
 
+        /** @var \IMAG\LdapBundle\Manager\LdapManagerUser $lm */
         $lm = $this->ldapManager
             ->setUsername($username)
             ->doPass();
@@ -57,6 +59,7 @@ class LdapUserProvider implements UserProviderInterface
             ->setUsername($lm->getUsername())
             ->setEmail($lm->getEmail())
             ->setRoles($lm->getRoles())
+            ->setGroups($lm->getRoles())
             ->setDn($lm->getDn())
             ->setAttributes($lm->getAttributes());
 
