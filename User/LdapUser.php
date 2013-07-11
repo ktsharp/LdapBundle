@@ -10,12 +10,29 @@ class LdapUser implements UserInterface, EquatableInterface, \Serializable
     protected $username;
     protected $email;
     protected $roles;
+    protected $groups;
     protected $dn;
     protected $attributes;
 
     public function getRoles()
     {
         return $this->roles;
+    }
+
+    public function setGroups($groups)
+    {
+        $this->groups = $groups;
+        return $this;
+    }
+
+    public function getGroups()
+    {
+        return (array) $this->groups;
+    }
+
+    public function getGroupNames()
+    {
+        return $this->getGroups();
     }
 
     public function getUserName()
@@ -120,6 +137,7 @@ class LdapUser implements UserInterface, EquatableInterface, \Serializable
             $this->username,
             $this->email,
             $this->roles,
+            $this->groups,
             $this->dn,
         ));
     }
@@ -130,6 +148,7 @@ class LdapUser implements UserInterface, EquatableInterface, \Serializable
             $this->username,
             $this->email,
             $this->roles,
+            $this->groups,
             $this->dn,
         ) = unserialize($serialized);
     }
